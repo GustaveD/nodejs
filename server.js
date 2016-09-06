@@ -1,67 +1,64 @@
-/*
+let express = require('express')
+let app = express()
+let bodyParser = require('body-parser')
+let session = require('express-session')
 
-let monEcouteur = new EventEmitter()
 
-monEcouteur.on('saute', function(a,b){
-	console.log("j'ai saute", a, b)
+
+
+////////////////VIEW
+//Moteur de template
+app.set('view engine', 'ejs')
+
+
+
+
+
+////////////////MIDDLEWARE
+
+app.use('/assets', express.static('public'))
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+// pour creer une session 
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
+
+
+//	creation d'un middleware pour les messages flash
+app.use(require('./middlewares/flash'))
+
+
+
+
+
+///////////////////ROUTAGE 
+
+app.get('/', (request, response)=> {
+
+
+	console.log(request.session)
+//	retourne une vue HTML
+	response.render('pages/index')
 })
 
-monEcouteur.emit('saute', 10, 20)
+//	recuperer les valeurs du formulaire post
+app.post('/', (request, response)=>{
 
-*/
-
-
-const EventEmitter = require('events')
-let http = require('http');
-let fs = require('fs');
-let url = require('url');
-
-let App = {
-	start: function (port){
-		let emitter = new EventEmitter()
-		let server = http.createServer((request, response) =>{
-			response.writeHead(200, {
-				'Content-type' : 'text/html; charset=utf-8'
-			})
-			if (request.url === '/'){
-				emitter.emit('root', response)
-			}
-			response.end()
-		}).listen(port)
-
-		return emitter
+	if (request.body.message === undefined || request.body.message == '')
+	{
+		request.flash('error', "Vous n'avez pas poste de message")
+		response.redirect('/')
 	}
-}
-
-let app = App.start(8080)
-app.on('root', function (response){
-	response.write("je suis a la racine")
+	console.log(request.body)
 })
 
-
-/*
-let server =http.createServer();
-server.on('request', (request, response) =>{
-
-	response.writeHead(200);
-	let query = (url.parse(request.url, true).query);
-
-
-	let name = query.name === undefined ? 'anonyme' : query.name
-
-		fs.readFile('index.php','utf8', (err, data) =>{
-		if (err){
-			response.writeHead(404)
-			response.end("ce Fichier n'existe pas")
-		}
-		else{
-			response.writeHead(200, {
-			'Content-type' : 'text/html; charset=utf-8'
-			})
-				data = data.replace('{{ name }}', name)
-			response.end(data)
-		}
-	})
-})
-server.listen(8080);
-*/
+app.listen(8080)
