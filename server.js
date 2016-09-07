@@ -32,7 +32,6 @@ app.use(session({
   cookie: { secure: false }
 }))
 
-
 //	creation d'un middleware pour les messages flash
 app.use(require('./middlewares/flash'))
 
@@ -53,12 +52,20 @@ app.get('/', (request, response)=> {
 //	recuperer les valeurs du formulaire post
 app.post('/', (request, response)=>{
 
-	if (request.body.message === undefined || request.body.message == '')
-	{
+	if (request.body.message === undefined || request.body.message == ''){
 		request.flash('error', "Vous n'avez pas poste de message")
 		response.redirect('/')
 	}
-	console.log(request.body)
+	else{
+		let Message = require('./models/message')
+			console.log('avant createa')
+		Message.create(request.body.message, function(){
+			console.log('dans create')
+			request.flash('success', "Merci !")
+			response.redirect('/')
+		})
+	}
+	
 })
 
-app.listen(8080)
+app.listen(3000)
