@@ -5,11 +5,9 @@ let session = require('express-session')
 
 
 
-
 ////////////////VIEW
-//Moteur de template
-app.set('view engine', 'ejs')
 
+app.set('view engine', 'ejs')
 
 
 
@@ -19,7 +17,7 @@ app.set('view engine', 'ejs')
 app.use('/assets', express.static('public'))
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // parse application/json
 app.use(bodyParser.json())
@@ -44,28 +42,40 @@ app.use(require('./middlewares/flash'))
 app.get('/', (request, response)=> {
 
 
-	console.log(request.session)
+	//console.log(request.session)
 //	retourne une vue HTML
-	response.render('pages/index')
+	response.render('pages/header2')
+})
+
+app.get('/header2', (request, response)=>{
+	response.render('pages/header2')
+})
+
+app.get('/inscription', (request, response)=>{
+	response.render('pages/inscription')
 })
 
 //	recuperer les valeurs du formulaire post
 app.post('/', (request, response)=>{
 
+	console.log(request.body)
 	if (request.body.message === undefined || request.body.message == ''){
 		request.flash('error', "Vous n'avez pas poste de message")
 		response.redirect('/')
 	}
 	else{
 		let Message = require('./models/message')
-			console.log('avant createa')
 		Message.create(request.body.message, function(){
-			console.log('dans create')
 			request.flash('success', "Merci !")
 			response.redirect('/')
 		})
 	}
 	
+})
+
+app.post('/inscription', (request, response)=>{
+	
+
 })
 
 app.listen(3000)
