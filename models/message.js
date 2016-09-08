@@ -21,7 +21,6 @@ class Message {
 					callback(res)
 				})		
 			}
-			console.log("a la fin de document")
 		})
 	}
 }
