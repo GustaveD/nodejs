@@ -1,5 +1,6 @@
 class Utilisateur {
 
+
 	static create (content, callback){
 		let mongo = require('mongodb').MongoClient;
 
@@ -18,6 +19,7 @@ class Utilisateur {
 			}
 		})
 	}
+
 }
 
 module.exports= Utilisateur
