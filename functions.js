@@ -40,6 +40,15 @@ exports.localReg = function (username, password) {
 };
 
 
+exports.localInscription = (username, pwd)=>{
+  var deferred = Q.defer()
+  var hash = bcrypt.hashSync(password, 8)
+  var user = {
+  }
+}
+
+
+
 //check if user exists
     //if user exists check if passwords match (use bcrypt.compareSync(password, hash); // true where 'hash' is password in DB)
       //if password matches take into website
