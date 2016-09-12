@@ -6,11 +6,10 @@ class Utilisateur {
 		var cursor = db.collection('users').find({name: username})
 		cursor.each((err, doc)=>{
 			assert.equal(err, null)
-			console.log(doc)
 			if (doc){
-				callback()
+				return true;
 			} else{
-				console.log("Nom non disponible")
+				return false;
 			}
 		})
 	}
@@ -26,9 +25,13 @@ class Utilisateur {
 				console.log("connecte a la base de donne matcha")
 				var user = {name: content.name, email: content.email, pwd: content.pwd}
 				
-				this.findUsers(db, content.name, function(){
+				if (this.findUsers(db, content.name, function(){
 					db.close
-				})
+				}) === true){
+					console.log('DEJA PRIS')
+				} else{
+					console.log('okoook')
+				}
 				db.collection("users").insert(user, null, (err, res)=>{
 					if (err) throw err
 					else
