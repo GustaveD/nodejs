@@ -3,6 +3,10 @@ var bcrypt = require('bcryptjs'),
     config = require('./config.js'), //config file contains all tokens and other private info
     db = require('orchestrate')(config.db); //config.db holds Orchestrate token
 
+
+//9936663e-e021-4f17-9199-1fdc877f78ab
+
+
 //used in local-signup strategy
 exports.localReg = function (username, password) {
   var deferred = Q.defer();

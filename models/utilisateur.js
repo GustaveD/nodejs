@@ -7,10 +7,19 @@ class Utilisateur {
 		cursor.each((err, doc)=>{
 			assert.equal(err, null)
 			if (doc){
-				return true;
+				callback(doc)
 			} else{
-				return false;
+				callback()
 			}
+		})
+	}
+
+	static insertUser(db, user, callback){
+		db.collection("users").insert(user, null, (err, res)=>{
+			if (err) throw err
+			else
+			console.log("l'utilisateur a bien ete enregistre")
+			callback(res)
 		})
 	}
 
@@ -20,23 +29,24 @@ class Utilisateur {
 		
 
 		mongo.connect("mongodb://localhost/matcha", (err, db)=>{
+			let error;
 			if (err) throw err
 			else{
 				console.log("connecte a la base de donne matcha")
 				var user = {name: content.name, email: content.email, pwd: content.pwd}
 				
-				if (this.findUsers(db, content.name, function(){
+				this.findUsers(db, content.name, (doc)=>{
+					if (doc){
+						console.log("le nom n\'est pas disponible")
+						return ;
+
+					} else {
+						console.log('Le nom est disponible')
+						this.insertUser(db, user, (res)=>{
+							return callback(res)
+						})
+					}
 					db.close
-				}) === true){
-					console.log('DEJA PRIS')
-				} else{
-					console.log('okoook')
-				}
-				db.collection("users").insert(user, null, (err, res)=>{
-					if (err) throw err
-					else
-						console.log("l'utilisateur a bien ete enregistre")
-					callback(res)
 				})
 			}
 		})

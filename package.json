@@ -17,7 +17,9 @@
     "express-session": "^1.14.1",
     "mongodb": "^2.2.9",
     "mysql": "^2.11.1",
+    "orchestrate": "^0.8.0",
     "passport": "^0.3.2",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "q": "^1.4.1"
   }
 }

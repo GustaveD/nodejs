@@ -5,7 +5,7 @@ let cookieParser = require('cookie-parser')
 let session = require('express-session')
 let passport = require('passport')
 let passportLocal = require('passport-local')
-
+let Q = require('q')
 
 
 ////////////////VIEW
@@ -62,8 +62,15 @@ app.get('/inscription', (request, response)=>{
 	response.render('pages/inscription')
 })
 
-app.get('/login', (request, response)=>{
-	response.render('pages/login')
+app.get('/login', (request, response, next)=>{
+	passport.authenticate('local', function(err, user, info) {
+    	if (err) { return next(err); }
+    	if (!user) { return response.redirect('/login'); }
+    	request.logIn(user, function(err) {
+    	  if (err) { return next(err); }
+    	  return response.redirect('/users/' + user.username);
+    	});
+  	})(req, response, next);
 })
 
 			///INSCRIPTION
@@ -83,6 +90,8 @@ app.post('/inscription', (request, response)=>{
 	}
 	else{
 		let Utilisateur = require('./models/utilisateur')
+		var deffered = Q.defer()
+
 		Utilisateur.create(request.body, function(){
 			request.flash('sucess', "Merci!")
 			response.redirect('/')
@@ -91,8 +100,18 @@ app.post('/inscription', (request, response)=>{
 })
 
 			///LOGIN
-app.post('/login', passport.authenticate('local'), (request, response)=>{
+app.post('/login', passport.authenticate('local', {successRedirect: '/', 
+													failureRedirect: '/login',
+														failureFlash: true})
 
-})
+)
+
+
+
+
+
+
+
+
 
 app.listen(3000)
