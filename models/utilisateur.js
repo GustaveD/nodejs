@@ -6,6 +6,7 @@ class Utilisateur {
 		var cursor = db.collection('users').find({name: username})
 		cursor.each((err, doc)=>{
 			assert.equal(err, null)
+			console.log(doc)
 			if (doc){
 				callback(doc)
 			} else{
@@ -13,6 +14,21 @@ class Utilisateur {
 			}
 		})
 	}
+
+	static findUsers2(db, username){
+		let assert = require('assert')
+		var cursor = db.collection('users').find({name: username})
+		cursor.each((err, doc)=>{
+			assert.equal(err, null)
+			console.log(doc)
+			if (doc){
+				
+			}else{
+				return false;
+			}
+		})
+	}
+
 
 	static insertUser(db, user, callback){
 		db.collection("users").insert(user, null, (err, res)=>{
@@ -23,7 +39,7 @@ class Utilisateur {
 		})
 	}
 
-	static create (content, callback){
+	static create (request, response, callback){
 		let mongo = require('mongodb').MongoClient
 		let bcrypt = require('bcryptjs')
 		
@@ -33,12 +49,25 @@ class Utilisateur {
 			if (err) throw err
 			else{
 				console.log("connecte a la base de donne matcha")
-				var user = {name: content.name, email: content.email, pwd: content.pwd}
+				var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd}
+
+				if ((this.findUsers2(db, request.body.name)) == true){
+					console.log('Le nom n\'est pas disponible')
+				}
+				else{
+					this.insertUser(db, user, (res)=>{
+						callback(res)
+					})
+				}
 				
-				this.findUsers(db, content.name, (doc)=>{
+				/*this.findUsers(db, request.body.name, (doc)=>{
+					console.log(doc , '  blbla')
 					if (doc){
 						console.log("le nom n\'est pas disponible")
-						return ;
+						db.close
+						request.flash('error', "Un Utilisateur utilise deja ce pseudo")
+						done(null, err)
+						//response.redirect('/inscription')
 
 					} else {
 						console.log('Le nom est disponible')
@@ -46,8 +75,8 @@ class Utilisateur {
 							return callback(res)
 						})
 					}
-					db.close
-				})
+					db.close;
+				})*/
 			}
 		})
 	}
