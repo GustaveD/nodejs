@@ -15,27 +15,30 @@ class Utilisateur {
 		})
 	}
 
-	static findUsers2(db, username){
-		let assert = require('assert')
-		var cursor = db.collection('users').find({name: username})
-		cursor.each((err, doc)=>{
-			assert.equal(err, null)
-			console.log(doc)
-			if (doc){
-				
-			}else{
-				return false;
-			}
-		})
-	}
+	static findUsers2(db, username, callback){
+
+		db.collection('users').find({name: username}).toArray(function (err, result) {
+      if (err) {
+        console.log(err);
+      } else if (result.length) {
+        console.log('Found:', result);
+      } else {
+        console.log('No document(s) found with defined "find" criteria!');
+        result = undefined
+      }
+      callback(result)
+    });
+}
 
 
 	static insertUser(db, user, callback){
 		db.collection("users").insert(user, null, (err, res)=>{
 			if (err) throw err
-			else
-			console.log("l'utilisateur a bien ete enregistre")
-			callback(res)
+			else{
+				console.log("l'utilisateur a bien ete enregistre")
+				callback(res)
+			}
+			
 		})
 	}
 
@@ -51,14 +54,14 @@ class Utilisateur {
 				console.log("connecte a la base de donne matcha")
 				var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd}
 
-				if ((this.findUsers2(db, request.body.name)) == true){
-					console.log('Le nom n\'est pas disponible')
-				}
-				else{
+				this.findUsers2(db, request.body.name, (res)=>{
+					console.log(res)
+
+				})
+				
 					this.insertUser(db, user, (res)=>{
 						callback(res)
 					})
-				}
 				
 				/*this.findUsers(db, request.body.name, (doc)=>{
 					console.log(doc , '  blbla')

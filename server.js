@@ -157,27 +157,35 @@ app.post('/inscription', (request, response)=>{
 		let Utilisateur = require('./models/utilisateur')
 		var deffered = Q.defer()
 
-		Utilisateur.create(request, response, function(){
+	/*	Utilisateur.create(request, response, function(){
 			request.flash('sucess', "Merci!")
 			response.redirect('/')
-		})
-    /*mongo.connect("mongodb://localhost/matcha", (err, db)=>{
+		})*/
+
+    mongo.connect("mongodb://localhost/matcha", (err, db)=>{
       if (err) throw err
       else{
-        Utilisateur.findUsers(db, request.body.name, (doc)=>{
-          if (doc){
-            console.log('dans doc')
-            request.flash('error', "Un Utilisateur utilise deja ce pseudo")
-           // response.redirect('/inscription')
-          } else{
-            var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd}
-            console.log(user)
-          }
-        })
+       db.collection('users').find({name: request.body.name}).toArray(function (err, result) {
+          if (err) throw err
+           else if (result.length) {
+           console.log('pseudo deja utilise');
+           request.flash('error', "Quelqu'un utilise deja ce nom")
+           response.redirect('/inscription')
+          } else {
+            var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd};
+            db.collection("users").insertOne(user, null, (err, res)=>{
+              if (err) throw err
+              else{
+                console.log("l'utilisateur a bien ete enregistre")
+                console.log(res.name)
+              }
+            })
 
-      }
-    })*/
-	}
+         }
+      })
+    }
+	})
+  }
 })
 
 			///LOGIN
