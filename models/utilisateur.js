@@ -54,7 +54,7 @@ class Utilisateur {
 				console.log("connecte a la base de donne matcha")
 				var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd}
 
-				this.findUsers2(db, request.body.name, (res)=>{
+				/*this.findUsers2(db, request.body.name, (res)=>{
 					console.log(res)
 
 				})
@@ -62,14 +62,14 @@ class Utilisateur {
 					this.insertUser(db, user, (res)=>{
 						callback(res)
 					})
-				
-				/*this.findUsers(db, request.body.name, (doc)=>{
+				*/
+				this.findUsers(db, request.body.name, (doc)=>{
 					console.log(doc , '  blbla')
 					if (doc){
 						console.log("le nom n\'est pas disponible")
 						db.close
 						request.flash('error', "Un Utilisateur utilise deja ce pseudo")
-						done(null, err)
+					//	done(null, err)
 						//response.redirect('/inscription')
 
 					} else {
@@ -79,7 +79,7 @@ class Utilisateur {
 						})
 					}
 					db.close;
-				})*/
+				})
 			}
 		})
 	}

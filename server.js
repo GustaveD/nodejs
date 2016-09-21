@@ -124,16 +124,15 @@ app.get('/inscription', (request, response)=>{
 	response.render('pages/inscription')
 })
 
-app.get('/login', (request, response, next)=>{
-	passport.authenticate('local', function(err, user, info) {
-    	if (err) { return next(err); }
-    	if (!user) { return response.redirect('/login'); }
-    	request.logIn(user, function(err) {
-    	  if (err) { return next(err); }
-    	  return response.redirect('/users/' + user.username);
-    	});
-  	})(req, response, next);
+app.get('/login', (request, response)=>{
+  response.render('pages/login')
 })
+
+app.get('/compte', (request, response)=>{
+  response.render('pages/compte')
+})
+
+
 
 			///INSCRIPTION
 app.post('/inscription', (request, response)=>{
@@ -157,12 +156,12 @@ app.post('/inscription', (request, response)=>{
 		let Utilisateur = require('./models/utilisateur')
 		var deffered = Q.defer()
 
-	/*	Utilisateur.create(request, response, function(){
+		Utilisateur.create(request, response, function(){
 			request.flash('sucess', "Merci!")
 			response.redirect('/')
-		})*/
+		})
 
-    mongo.connect("mongodb://localhost/matcha", (err, db)=>{
+  /*  mongo.connect("mongodb://localhost/matcha", (err, db)=>{
       if (err) throw err
       else{
        db.collection('users').find({name: request.body.name}).toArray(function (err, result) {
@@ -184,7 +183,7 @@ app.post('/inscription', (request, response)=>{
          }
       })
     }
-	})
+	})*/
   }
 })
 
