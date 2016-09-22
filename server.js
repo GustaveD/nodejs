@@ -40,6 +40,48 @@ app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
+app.use(function (req, res, next) {
+  console.log('Time:', Date.now());
+  next();
+});
+
+app.use(function(req, res, next){
+  if (req.session && req.session.user){
+    let Utilisateur = require('./models/utilisateur')
+    Utilisateur.findUsers3(req.session.user.name, (result, err)=>{
+      console.log('dashhhboard', result)
+      if (err){
+        console.log(err)
+      }else{
+        if (result[0])
+        {
+          req.user = result[0];
+          console.log(req.user)
+          delete req.user.pwd;
+          req.session.user = result[0];
+          res.locals.user = result[0];
+
+        } else{
+
+        }
+        next();
+      }
+    })
+  } else{
+    console.log('non log')
+    next();
+  }
+})
+
+function requireLogin (req, res, next) {
+  if (!req.user) {
+    res.redirect('/login');
+  } else {
+    next();
+  }
+};
+
+
 
 /*
 //===============PASSPORT=================
@@ -132,32 +174,34 @@ app.get('/compte', (request, response)=>{
   response.render('pages/compte')
 })
 
-app.get('/dashboard', (request, response)=>{
-  if (request.session && request.session.user){
-    //Check if session exists
-    //lookup the user in the db by pullin their email from the sesssion
-    let Utilisateur = require('./models/utilisateur')
-    Utilisateur.findUsers3(request.session.user.name, (result, err)=>{
-      console.log('dashhhboard', result)
-      if (err){
-        console.log(err)
-      }else{
-        if (result[0] === undefined){
-          request.session.reset();
-          response.redirect('/login');
-        } else{
-          response.locals.user = result[0];
-          response.render('pages/dashboard')
-        }
-      }
-    })
-  } else{
-    response.redirect('/login')
-  }
+app.get('/dashboard', requireLogin, (request, response)=>{
+//  if (request.session && request.session.user){
+//    //Check if session exists
+//    //lookup the user in the db by pullin their email from the sesssion
+//    let Utilisateur = require('./models/utilisateur')
+//    Utilisateur.findUsers3(request.session.user.name, (result, err)=>{
+//      console.log('dashhhboard', result)
+//      if (err){
+//        console.log(err)
+//      }else{
+//        if (result[0] === undefined){
+//          request.session.reset();
+//          response.redirect('/login');
+//        } else{
+//          response.locals.user = result[0];
+//          response.render('pages/dashboard')
+//        }
+//      }
+//    })
+//  } else{
+//    response.redirect('/login')
+//  }
+  response.render('pages/dashboard')
+
 })
 
 app.get('/logout', (request, response)=>{
-  request.session.destroy();
+  request.session.reset()
   console.log('log out ok')
   response.redirect('/')
 })

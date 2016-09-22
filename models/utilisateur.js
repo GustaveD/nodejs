@@ -68,6 +68,19 @@ static findUsers3(username, callback){
 		})
 	}
 
+	static modifUser(username, callback){
+		let mongo = require('mongodb').MongoClient;
+
+		mongo.connect("mongodb://localhost/matcha", (err, db)=>{
+			if (err){
+				throw err
+			} else{
+				console.log("connecte a la bdd")
+				var user = {name: request.body.name, emai}
+			}
+		})
+	}
+
 	static create (request, response, callback){
 		let mongo = require('mongodb').MongoClient
 		let bcrypt = require('bcryptjs')
