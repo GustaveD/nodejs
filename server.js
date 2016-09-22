@@ -132,6 +132,36 @@ app.get('/compte', (request, response)=>{
   response.render('pages/compte')
 })
 
+app.get('/dashboard', (request, response)=>{
+  if (request.session && request.session.user){
+    //Check if session exists
+    //lookup the user in the db by pullin their email from the sesssion
+    let Utilisateur = require('./models/utilisateur')
+    Utilisateur.findUsers3(request.session.user.name, (result, err)=>{
+      console.log('dashhhboard', result)
+      if (err){
+        console.log(err)
+      }else{
+        if (result[0] === undefined){
+          request.session.reset();
+          response.redirect('/login');
+        } else{
+          response.locals.user = result[0];
+          response.render('pages/dashboard')
+        }
+      }
+    })
+  } else{
+    response.redirect('/login')
+  }
+})
+
+app.get('/logout', (request, response)=>{
+  request.session.destroy();
+  console.log('log out ok')
+  response.redirect('/')
+})
+
 
 
 			///INSCRIPTION
@@ -188,12 +218,32 @@ app.post('/inscription', (request, response)=>{
 })
 
 			///LOGIN
-app.post('/login', passport.authenticate('local', {successRedirect: '/', 
-													failureRedirect: '/login',
-														failureFlash: true})
-
-)
-
+app.post('/login', (request, response)=>{
+    let Utilisateur = require('./models/utilisateur')
+  Utilisateur.findUsers3(request.body.name, (result, err)=>{
+    if (err){
+      console.log('error: ', err)
+    } 
+    else{
+      if (result === undefined){
+        request.flash('error', "Pseudo inconnu")
+      }else{
+          console.log('REQUEST', request.body.password)
+          console.log('PASS', result[0].pwd)
+        if (request.body.password === result[0].pwd){
+          //set info cookie
+          request.flash('success', "bien enregistre")
+          request.session.user = result[0];
+          console.log('SESSION USER', request.session.user)
+        }
+        else{
+          request.flash('error', "mauvais mdp")
+        }
+      }
+    }
+    response.redirect('/');
+  })
+})
 
 
 

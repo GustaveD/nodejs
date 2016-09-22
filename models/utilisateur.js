@@ -30,6 +30,32 @@ class Utilisateur {
     });
 }
 
+static findUsers3(username, callback){
+
+		let mongo = require('mongodb').MongoClient;
+
+		mongo.connect("mongodb://localhost/matcha", (err, db)=>{
+			let error;
+			if (err){
+				throw err
+			}
+			else{
+				console.log("connecte a la base de donne matcha")
+				db.collection('users').find({name: username}).toArray(function (err, result) {
+     		 	if (err) {
+     		   		callback (err);
+     		 	} else if (result.length) {
+       		 		console.log('Found:', result);
+    		  	} else {
+      		  		console.log('No document(s) found with defined "find" criteria!');
+      		  		result = undefined
+     		 	}
+     		 	callback(result)
+   		 		});
+			}
+		})
+	}
+
 
 	static insertUser(db, user, callback){
 		db.collection("users").insert(user, null, (err, res)=>{
