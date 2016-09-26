@@ -49,7 +49,7 @@ app.use(function(req, res, next){
   if (req.session && req.session.user){
     let Utilisateur = require('./models/utilisateur')
     Utilisateur.findUsers3(req.session.user.name, (result, err)=>{
-      console.log('dashhhboard', result)
+      console.log('BIEN CONNECTE')
       if (err){
         console.log(err)
       }else{
@@ -75,84 +75,12 @@ app.use(function(req, res, next){
 
 function requireLogin (req, res, next) {
   if (!req.user) {
+    req.flash('error', "il faut s'autentifier")
     res.redirect('/login');
   } else {
     next();
   }
 };
-
-
-
-/*
-//===============PASSPORT=================
-
-// Passport session setup.
-passport.serializeUser(function(user, done) {
-  console.log("serializing " + user.username);
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  console.log("deserializing " + obj);
-  done(null, obj);
-});
-
-// Use the LocalStrategy within Passport to login users.
-passport.use('local-signin', new LocalStrategy(
-  {passReqToCallback : true}, //allows us to pass back the request to the callback
-  function(req, username, password, done) {
-    funct.localAuth(username, password)
-    .then(function (user) {
-      if (user) {
-        console.log("LOGGED IN AS: " + user.username);
-        req.session.success = 'You are successfully logged in ' + user.username + '!';
-        done(null, user);
-      }
-      if (!user) {
-        console.log("COULD NOT LOG IN");
-        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
-        done(null, user);
-      }
-    })
-    .fail(function (err){
-      console.log(err.body);
-    });
-  }
-));
-
-// Use the LocalStrategy within Passport to Register/"signup" users.
-passport.use('local-signup', new LocalStrategy(
-  {passReqToCallback : true}, //allows us to pass back the request to the callback
-  function(req, username, password, done) {
-    funct.localReg(username, password)
-    .then(function (user) {
-      if (user) {
-        console.log("REGISTERED: " + user.username);
-        req.session.success = 'You are successfully registered and logged in ' + user.username + '!';
-        done(null, user);
-      }
-      if (!user) {
-        console.log("COULD NOT REGISTER");
-        req.session.error = 'That username is already in use, please try a different one.'; //inform user could not log them in
-        done(null, user);
-      }
-    })
-    .fail(function (err){
-      console.log(err.body);
-    });
-  }
-));
-
-// Simple route middleware to ensure user is authenticated.
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  req.session.error = 'Please sign in!';
-  res.redirect('/inscription');
-}
-
-
-*/
-
 
 
 ///////////////////ROUTAGE 
@@ -170,38 +98,16 @@ app.get('/login', (request, response)=>{
   response.render('pages/login')
 })
 
-app.get('/compte', (request, response)=>{
+app.get('/compte', requireLogin, (request, response)=>{
   response.render('pages/compte')
 })
 
 app.get('/dashboard', requireLogin, (request, response)=>{
-//  if (request.session && request.session.user){
-//    //Check if session exists
-//    //lookup the user in the db by pullin their email from the sesssion
-//    let Utilisateur = require('./models/utilisateur')
-//    Utilisateur.findUsers3(request.session.user.name, (result, err)=>{
-//      console.log('dashhhboard', result)
-//      if (err){
-//        console.log(err)
-//      }else{
-//        if (result[0] === undefined){
-//          request.session.reset();
-//          response.redirect('/login');
-//        } else{
-//          response.locals.user = result[0];
-//          response.render('pages/dashboard')
-//        }
-//      }
-//    })
-//  } else{
-//    response.redirect('/login')
-//  }
   response.render('pages/dashboard')
-
 })
 
 app.get('/logout', (request, response)=>{
-  request.session.reset()
+  request.session.destroy()
   console.log('log out ok')
   response.redirect('/')
 })
@@ -234,30 +140,6 @@ app.post('/inscription', (request, response)=>{
 			request.flash('sucess', "Merci!")
 			response.redirect('/')
 		})
-
-  /*  mongo.connect("mongodb://localhost/matcha", (err, db)=>{
-      if (err) throw err
-      else{
-       db.collection('users').find({name: request.body.name}).toArray(function (err, result) {
-          if (err) throw err
-           else if (result.length) {
-           console.log('pseudo deja utilise');
-           request.flash('error', "Quelqu'un utilise deja ce nom")
-           response.redirect('/inscription')
-          } else {
-            var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd};
-            db.collection("users").insertOne(user, null, (err, res)=>{
-              if (err) throw err
-              else{
-                console.log("l'utilisateur a bien ete enregistre")
-                console.log(res.name)
-              }
-            })
-
-         }
-      })
-    }
-	})*/
   }
 })
 
@@ -276,7 +158,7 @@ app.post('/login', (request, response)=>{
           console.log('PASS', result[0].pwd)
         if (request.body.password === result[0].pwd){
           //set info cookie
-          request.flash('success', "bien enregistre")
+          request.flash('success', "bien Connecte")
           request.session.user = result[0];
           console.log('SESSION USER', request.session.user)
         }
@@ -290,11 +172,18 @@ app.post('/login', (request, response)=>{
 })
 
 
+      ////COMPTE
+app.post('/compte', (request, response)=>{
 
-
-
-
-
-
+  let Utilisateur = require('./models/utilisateur')
+  Utilisateur.modifUser(request, (res, err)=>{
+    if (err){
+      console.log('error: ', err)
+    } else {
+      request.flash('success', "informations bien enregistrées")
+    }
+  })
+ // response.redirect('/')
+})
 
 app.listen(3000)

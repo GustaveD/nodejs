@@ -15,21 +15,6 @@ class Utilisateur {
 		})
 	}
 
-	static findUsers2(db, username, callback){
-
-		db.collection('users').find({name: username}).toArray(function (err, result) {
-      if (err) {
-        console.log(err);
-      } else if (result.length) {
-        console.log('Found:', result);
-      } else {
-        console.log('No document(s) found with defined "find" criteria!');
-        result = undefined
-      }
-      callback(result)
-    });
-}
-
 static findUsers3(username, callback){
 
 		let mongo = require('mongodb').MongoClient;
@@ -68,15 +53,22 @@ static findUsers3(username, callback){
 		})
 	}
 
-	static modifUser(username, callback){
+	static modifUser(request, callback){
 		let mongo = require('mongodb').MongoClient;
 
 		mongo.connect("mongodb://localhost/matcha", (err, db)=>{
+			console.log("MODIF INFORMATION USER-----")
 			if (err){
 				throw err
 			} else{
+				//console.log("REQUEST: ", request)
+				console.log(request.body.pseudo)
 				console.log("connecte a la bdd")
-				var user = {name: request.body.name, emai}
+				var user ={name: request.body.pseudo, email: request.body.email, pwd: request.body.pwd,
+							nom: request.body.nom, prenom: request.body.prenom}
+
+				console.log("USER: ", user)
+				callback()
 			}
 		})
 	}
@@ -93,23 +85,12 @@ static findUsers3(username, callback){
 				console.log("connecte a la base de donne matcha")
 				var user = {name: request.body.name, email: request.body.email, pwd: request.body.pwd}
 
-				/*this.findUsers2(db, request.body.name, (res)=>{
-					console.log(res)
-
-				})
-				
-					this.insertUser(db, user, (res)=>{
-						callback(res)
-					})
-				*/
 				this.findUsers(db, request.body.name, (doc)=>{
 					console.log(doc , '  blbla')
 					if (doc){
 						console.log("le nom n\'est pas disponible")
 						db.close
 						request.flash('error', "Un Utilisateur utilise deja ce pseudo")
-					//	done(null, err)
-						//response.redirect('/inscription')
 
 					} else {
 						console.log('Le nom est disponible')
