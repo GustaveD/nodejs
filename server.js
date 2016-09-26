@@ -32,6 +32,16 @@ app.use(session({
   cookie: { secure: false }
 }))
 
+
+  var get_ip = require('ipware')().get_ip;
+    app.use(function(req, res, next) {
+        var ip_info = get_ip(req);
+        console.log("=-----IP_INFOO SERVERJS", ip_info);
+        // { clientIp: '127.0.0.1', clientIpRoutable: false }
+        next();
+    });
+
+
 //	creation d'un middleware pour les messages flash
 app.use(require('./middlewares/flash'))
 

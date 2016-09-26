@@ -65,9 +65,15 @@ static findUsers3(username, callback){
 	static modifUser(request, callback){
 		let mongo = require('mongodb').MongoClient;
 		var geoip = require('geoip-lite')
+		var get_ip = require('ipware')().get_ip;
 
-		var ip = request.connection.remoteAdress
-		var geo= geoip.lookup(ip)
+
+
+		var ip_info = get_ip(request)
+
+		console.log("----IPPP INFOOO", ip_info.clientIP)
+
+		var geo= geoip.lookup(ip_info)
 
 		console.log("---GEOOOO", geo)
 

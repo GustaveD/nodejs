@@ -16,6 +16,7 @@
     "express": "^4.14.0",
     "express-session": "^1.14.1",
     "geoip-lite": "^1.1.8",
+    "ipware": "file:node-ipware",
     "mongodb": "^2.2.9",
     "mysql": "^2.11.1",
     "orchestrate": "^0.8.0",
