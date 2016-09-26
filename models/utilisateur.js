@@ -25,12 +25,11 @@ static findUsers3(username, callback){
 				throw err
 			}
 			else{
-				console.log("connecte a la base de donne matcha")
+				console.log("-----FIND USER MONGO")
 				db.collection('users').find({name: username}).toArray(function (err, result) {
      		 	if (err) {
      		   		callback (err);
      		 	} else if (result.length) {
-       		 		console.log('Found:', result);
     		  	} else {
       		  		console.log('No document(s) found with defined "find" criteria!');
       		  		result = undefined
@@ -41,6 +40,16 @@ static findUsers3(username, callback){
 		})
 	}
 
+	static updateUser(user, db, username, callback){
+		console.log('-----UPDATE USER: ', username)
+		db.collection("users").updateOne({"name": username}, {$set: {"email": user.email, "pwd": user.pwd,
+											"nom": user.nom, "prenom": user.prenom, "like": user.like,
+											"popularite": user.popularite}}, (err, res)=>{
+			if (err) console.log("----/!/----ERROR UPDATE",err)
+			console.log("fin update")
+			callback()
+		})
+	}
 
 	static insertUser(db, user, callback){
 		db.collection("users").insert(user, null, (err, res)=>{
@@ -55,20 +64,26 @@ static findUsers3(username, callback){
 
 	static modifUser(request, callback){
 		let mongo = require('mongodb').MongoClient;
+		var geoip = require('geoip-lite')
+
+		var ip = request.connection.remoteAdress
+		var geo= geoip.lookup(ip)
+
+		console.log("---GEOOOO", geo)
 
 		mongo.connect("mongodb://localhost/matcha", (err, db)=>{
 			console.log("MODIF INFORMATION USER-----")
 			if (err){
 				throw err
 			} else{
-				//console.log("REQUEST: ", request)
-				console.log(request.body.pseudo)
-				console.log("connecte a la bdd")
-				var user ={name: request.body.pseudo, email: request.body.email, pwd: request.body.pwd,
-							nom: request.body.nom, prenom: request.body.prenom}
+				console.log('-----MODIF USER: ')
+				var user = {email: request.body.email, pwd: request.body.pwd, nom: request.body.nom,
+								prenom: request.body.prenom, like: 0, popularite: 0}
+				console.log('---New User: ', user)
+				this.updateUser(user, db, request.user.name, (res)=>{
+					console.log('-----FIN MODIF USER')
+				})
 
-				console.log("USER: ", user)
-				callback()
 			}
 		})
 	}

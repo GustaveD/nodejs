@@ -56,7 +56,7 @@ app.use(function(req, res, next){
         if (result[0])
         {
           req.user = result[0];
-          console.log(req.user)
+          console.log("-----REQUEST-USER:", req.user)
           delete req.user.pwd;
           req.session.user = result[0];
           res.locals.user = result[0];
@@ -130,14 +130,11 @@ app.post('/inscription', (request, response)=>{
 		response.redirect('/inscription')
 	}
 	else{
-    let mongo = require('mongodb').MongoClient
-    let bcrypt = require('bcryptjs')
-    //let Utilisateur = require('./models/utilisateur')
 		let Utilisateur = require('./models/utilisateur')
-		var deffered = Q.defer()
 
-		Utilisateur.create(request, response, function(){
-			request.flash('sucess', "Merci!")
+		Utilisateur.create(request, response, function(res){
+      console.log('coucou')
+			request.flash('sucess', "merci") //  /!\ ne s'affiche pas
 			response.redirect('/')
 		})
   }
@@ -145,7 +142,7 @@ app.post('/inscription', (request, response)=>{
 
 			///LOGIN
 app.post('/login', (request, response)=>{
-    let Utilisateur = require('./models/utilisateur')
+  let Utilisateur = require('./models/utilisateur')
   Utilisateur.findUsers3(request.body.name, (result, err)=>{
     if (err){
       console.log('error: ', err)
@@ -183,7 +180,7 @@ app.post('/compte', (request, response)=>{
       request.flash('success', "informations bien enregistrées")
     }
   })
- // response.redirect('/')
+  response.redirect('/')
 })
 
 app.listen(3000)
