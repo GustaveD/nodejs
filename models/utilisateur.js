@@ -69,11 +69,18 @@ static findUsers3(username, callback){
 
 
 
-		var ip_info = get_ip(request)
+		//var ip_info = get_ip(request)
 
-		console.log("----IPPP INFOOO", ip_info.clientIP)
+		var ip = request.headers['x-forwarded-for'] || 
+     request.connection.remoteAddress || 
+     request.socket.remoteAddress ||
+     request.connection.socket.remoteAddress;
 
-		var geo= geoip.lookup(ip_info)
+     var ipp = '127.0.0.1';
+
+		console.log("----IPPP INFOOO", ip)
+
+		var geo= geoip.lookup(ipp)
 
 		console.log("---GEOOOO", geo)
 
